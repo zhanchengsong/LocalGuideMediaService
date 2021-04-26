@@ -13,7 +13,7 @@ var (
 	HOST              = "localhost"
 	PORT              = "9000"
 	BUCKET            = "user-avator"
-	ACCESS_KEY_ID     = "localAccessKey"
+	ACCESS_KEY_ID     = "localTestKey"
 	ACCESS_SECRET_KEY = "localSecretKey"
 	USE_SSL           = false
 	LOCATION          = "us-east-1"
