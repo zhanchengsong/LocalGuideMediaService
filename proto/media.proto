@@ -1,0 +1,19 @@
+syntax = "proto3";
+package mediaProto;
+option go_package = "github.com/zhanchengsong/LocalGuideMediaService/proto";
+service image {
+    rpc ImageUpload(ImageUploadRequest) returns (ImageUploadResponse) {};
+}
+
+message ImageUploadRequest {
+    string imageName = 1;
+    string imageType = 2;
+    int64 imageSize = 3;
+    bytes chunk = 4;
+}
+
+message ImageUploadResponse {
+    string imageId = 1;
+    string url = 2;
+    int32 size = 3;
+}
