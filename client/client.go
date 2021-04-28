@@ -31,7 +31,7 @@ func uploadImage(client media_pb.ImageClient, filePath string) {
 
 func main() {
 	var opts []grpc.DialOption
-	serverAddr := "localhost:5005"
+	serverAddr := "media.zhancheng.dev"
 	log.Print(serverAddr)
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())

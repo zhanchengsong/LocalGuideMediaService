@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	port = ":5005"
+	port = ":50051"
 )
 
 type mediaServer struct {
