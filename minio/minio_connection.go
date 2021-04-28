@@ -2,6 +2,7 @@ package media_minio
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/minio/minio-go/v7"
@@ -10,13 +11,13 @@ import (
 )
 
 var (
-	HOST              = "localhost"
-	PORT              = "9000"
-	BUCKET            = "user-avator"
-	ACCESS_KEY_ID     = "localTestKey"
-	ACCESS_SECRET_KEY = "localSecretKey"
+	HOST              = os.Getenv("MINIO_HOST")
+	PORT              = os.Getenv("MINIO_PORT")
+	BUCKET            = os.Getenv("MINIO_BUCKET_NAME")
+	ACCESS_KEY_ID     = os.Getenv("MINIO_ACCESS_KEY")
+	ACCESS_SECRET_KEY = os.Getenv("MINIO_SECRET_KEY")
 	USE_SSL           = false
-	LOCATION          = "us-east-1"
+	LOCATION          = os.Getenv("MINIO_LOCATION")
 )
 
 var minioOnce sync.Once
