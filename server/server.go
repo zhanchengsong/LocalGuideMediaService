@@ -80,6 +80,6 @@ func main() {
 	media_pb.RegisterImageServer(s, &mediaServer{})
 	getLogger("Server").Info(fmt.Sprintf("Running rpc server at port %s", port))
 	if err := s.Serve(lis); err != nil {
-		getLogger("Server").Fatal("failed to server : %v", err)
+		getLogger("Server").Fatal(fmt.Sprintf("failed to server : %v", err))
 	}
 }
