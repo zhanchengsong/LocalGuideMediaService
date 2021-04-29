@@ -10,6 +10,7 @@ import (
 
 	media_pb "github.com/zhanchengsong/LocalGuideMediaService/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func uploadImage(client media_pb.ImageClient, filePath string) {
@@ -30,12 +31,10 @@ func uploadImage(client media_pb.ImageClient, filePath string) {
 }
 
 func main() {
-	var opts []grpc.DialOption
-	serverAddr := "media.zhancheng.dev"
+	serverAddr := "media.zhancheng.dev:443"
 	log.Print(serverAddr)
-	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithBlock())
-	conn, err := grpc.Dial(serverAddr, opts...)
+	creds, _ := credentials.NewClientTLSFromFile("tls.crt", "")
+	conn, err := grpc.Dial(serverAddr, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
