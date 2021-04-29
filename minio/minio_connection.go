@@ -1,6 +1,7 @@
 package media_minio
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -44,6 +45,23 @@ func ConnectMinio() (*minio.Client, error) {
 			getLogger().Error(minioClientError.Error())
 			return
 		}
+		bucketName := BUCKET
+		location := LOCATION
+		ctx := context.Background()
+		err := minioClientInstance.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
+		// Create the user avatar bucket
+		if err != nil {
+			// Check to see if we already own this bucket (which happens if you run this twice)
+			exists, errBucketExists := minioClientInstance.BucketExists(ctx, bucketName)
+			if errBucketExists == nil && exists {
+				getLogger().Info("Already owned " + bucketName)
+			} else {
+				getLogger().Fatal(err.Error())
+			}
+		} else {
+			getLogger().Info("Successfully created " + bucketName)
+		}
+
 	})
 	return minioClientInstance, minioClientError
 }

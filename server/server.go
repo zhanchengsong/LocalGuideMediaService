@@ -48,27 +48,33 @@ func (s *mediaServer) ImageUpload(ctx context.Context, req *media_pb.ImageUpload
 	return &media_pb.ImageUploadResponse{ImageId: objectName, Url: "", Size: int32(info.Size)}, err
 }
 
+func (s *mediaServer) ImageDownload(ctx context.Context, req *media_pb.ImageDownloadRequest) (*media_pb.ImageDownloadResponse, error) {
+	getLogger("ImageDownload").Info("Processing Image Download")
+	imageId := req.GetImageId()
+	minioClient, err := media_minio.ConnectMinio()
+	if err != nil {
+		getLogger("ImageDownload").Error(err.Error())
+		return nil, err
+	}
+	data, err := minioClient.GetObject(context.Background(), media_minio.BUCKET, imageId, minio.GetObjectOptions{})
+	defer data.Close()
+	if err != nil {
+		getLogger("ImageDownload").Error(err.Error())
+		return nil, err
+	}
+	stat, _ := data.Stat()
+	dataSize := stat.Size
+	imageBuffer := make([]byte, dataSize)
+	data.Read(imageBuffer)
+	return &media_pb.ImageDownloadResponse{Chunk: imageBuffer}, nil
+
+}
+
 func main() {
 	// setup minio
-	minioClient, minioError := media_minio.ConnectMinio()
+	_, minioError := media_minio.ConnectMinio()
 	if minioError != nil {
 		getLogger("Server").Fatal(minioError.Error())
-	}
-	bucketName := "user-avator"
-	location := "us-east-1"
-	ctx := context.Background()
-	err := minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
-	// Create the user avatar bucket
-	if err != nil {
-		// Check to see if we already own this bucket (which happens if you run this twice)
-		exists, errBucketExists := minioClient.BucketExists(ctx, bucketName)
-		if errBucketExists == nil && exists {
-			log.Printf("We already own %s\n", bucketName)
-		} else {
-			log.Fatalln(err)
-		}
-	} else {
-		log.Printf("Successfully created %s\n", bucketName)
 	}
 
 	// set up go rpc server

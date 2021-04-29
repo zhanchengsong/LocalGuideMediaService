@@ -10,10 +10,9 @@ import (
 
 	media_pb "github.com/zhanchengsong/LocalGuideMediaService/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
-func uploadImage(client media_pb.ImageClient, filePath string) {
+func uploadImage(client media_pb.ImageClient, filePath string) string {
 	log.Printf("Client upload image")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -27,14 +26,26 @@ func uploadImage(client media_pb.ImageClient, filePath string) {
 		log.Fatal(err.Error())
 	}
 	log.Print(fmt.Sprintf("Uploaded %d bytes of data", uploadResult.GetSize()))
+	return uploadResult.ImageId
 
 }
 
+func downloadImage(client media_pb.ImageClient, imageId string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	req := media_pb.ImageDownloadRequest{ImageId: imageId}
+	downloadResult, err := client.ImageDownload(ctx, &req)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Print(fmt.Sprintf("Downloaded %v bytes of data", len(downloadResult.GetChunk())))
+}
+
 func main() {
-	serverAddr := "media.zhancheng.dev:443"
+	serverAddr := "localhost:50051"
 	log.Print(serverAddr)
-	creds, _ := credentials.NewClientTLSFromFile("tls.crt", "")
-	conn, err := grpc.Dial(serverAddr, grpc.WithTransportCredentials(creds))
+	//creds, _ := credentials.NewClientTLSFromFile("tls.crt", "")
+	conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
@@ -44,6 +55,7 @@ func main() {
 
 	//Test
 	pwd, _ := os.Getwd()
-	uploadImage(client, pwd+"/test.png")
+	imageId := uploadImage(client, pwd+"/test.png")
+	downloadImage(client, imageId)
 
 }
